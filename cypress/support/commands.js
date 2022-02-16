@@ -4,12 +4,12 @@
  */
 
 import {
-  AD_GET_DETECTORS_NODE_API_PATH,
-  AD_GET_INDICES_NODE_API_PATH,
-  getADStartDetectorNodeApiPath,
-  getADStopDetectorNodeApiPath,
-  AD_GET_MAPPINGS_NODE_API_PATH,
-  IM_API, IM_CONFIG_INDEX
+    AD_GET_DETECTORS_NODE_API_PATH,
+    AD_GET_INDICES_NODE_API_PATH,
+    getADStartDetectorNodeApiPath,
+    getADStopDetectorNodeApiPath,
+    AD_GET_MAPPINGS_NODE_API_PATH,
+    IM_API, IM_CONFIG_INDEX, BASE_PATH
 } from '../utils/constants';
 
 const ADMIN_AUTH = {
@@ -60,6 +60,18 @@ Cypress.Commands.overwrite('request', (originalFn, ...args) => {
   }
 
   return originalFn(Object.assign({}, defaults, options));
+});
+
+Cypress.Commands.add('login', () => {
+    // much faster than log in through UI
+    cy.request({
+        method: 'POST',
+        url: `${BASE_PATH}/auth/login`,
+        body: ADMIN_AUTH,
+        headers: {
+            'osd-xsrf': true
+        }
+    })
 });
 
 /**
@@ -156,6 +168,7 @@ Cypress.Commands.add(
  */
 Cypress.Commands.add("deleteAllIndices", () => {
     cy.request("DELETE", `${Cypress.env("openSearchUrl")}/index*,sample*,opensearch_dashboards*`);
+    // TODO don't directly delete system index, use other way
     cy.request("DELETE", `${Cypress.env("openSearchUrl")}/.opendistro-ism*?expand_wildcards=all`);
 });
 

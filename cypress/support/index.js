@@ -26,3 +26,16 @@ Cypress.on('uncaught:exception', (err) => {
     return false;
   }
 });
+
+// Proxy layer of AWS OpenSearch domain redirects to login page
+//  if you haven't authenticate
+if (Cypress.env('AWS_DOMAIN')) {
+  Cypress.Cookies.debug(false);
+  before(() => {
+    cy.login();
+  })
+
+  beforeEach(() => {
+    Cypress.Cookies.preserveOnce('security_authentication');
+  })
+}
